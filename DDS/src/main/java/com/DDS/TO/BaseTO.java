@@ -20,6 +20,10 @@ public class BaseTO {
 		return baseMap;
 	}
 	
+	public String getBaseMapVal(String key) {
+		return baseMap.get(key);
+	}
+	
 	public void addBaseMap(String key, String val) {
 		baseMap.put(key , val);
 	}

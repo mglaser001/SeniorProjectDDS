@@ -19,6 +19,7 @@ public class ReleaseNoteProcessor extends BaseProcessor {
 	private String reportTitle;
 
 	public void initialize() {
+		
 		List<String> issueIid = new ArrayList<String>();
 		String projectid = System.getProperty("ProjectId");
 		reportTitle = System.getProperty("ReportTitle");
@@ -33,7 +34,7 @@ public class ReleaseNoteProcessor extends BaseProcessor {
 					sheetData.addBaseMap("requestor", n.getBody().replaceAll("#requestor", ""));
 				} else if (n.getBody().contains("#releasenotes")) {
 					counter++;
-					sheetData.addBaseMap("releasenotes", n.getBody().replaceAll("#releasenotes", ""));
+					sheetData.addBaseMap("description", "Description: "+ i.getDescription() +"\n" +n.getBody().replaceAll("#releasenotes", ""));
 				}
 
 			}
