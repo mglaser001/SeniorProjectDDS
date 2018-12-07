@@ -29,11 +29,11 @@ public class ReleaseNoteProcessor {
 	private String emailList = System.getProperty("email");;
 	private String description = System.getProperty("description");;
 	private String[] toEmails;
+	
 	public void initialize() {
 		
 		toEmails = emailList.split(",");
-		
-	//	List<String> issueIid = new ArrayList<String>();
+
  		String projectid = System.getProperty("ProjectId");
 		issues = GitlabDAO.getIssuesFromProjectid(projectid);
 		for (Issue i : issues) {

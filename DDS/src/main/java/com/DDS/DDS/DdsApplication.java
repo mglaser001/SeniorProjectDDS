@@ -13,11 +13,12 @@ public class DdsApplication implements CommandLineRunner{
 	final static String releasenoteprocessor = "RELEASENOTEPROCESSOR";
 	
 	public static void main(String[] args) {
+		
 		SpringApplication.run(DdsApplication.class, args);
 	}
 	@Override
 	public void run(String... args) throws Exception{
-		
+		System.out.println("=================DSS Program Start==================");
 		String cmd = System.getProperty("processorselect");
 		
 		if(cmd.contains(releasenoteprocessor)) {
