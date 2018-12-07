@@ -5,7 +5,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.DDS.Processors.ReleaseNoteProcessor;
+import com.DSS.Processors.ReleaseNoteProcessor;
 
 @SpringBootApplication
 public class DdsApplication implements CommandLineRunner{

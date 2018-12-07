@@ -1,4 +1,4 @@
-package com.DDS.Processors;
+package com.DSS.Processors;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -12,13 +12,13 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
-import com.DDS.DAO.GitlabDAO;
-import com.DDS.TO.BaseTO;
-import com.DDS.TO.Group;
-import com.DDS.TO.Issue;
-import com.DDS.TO.Notes;
-import com.DDS.utils.EmailUtil;
-import com.DDS.utils.ReleaseNotePDFUtil;
+import com.DSS.DAO.GitlabDAO;
+import com.DSS.TO.BaseTO;
+import com.DSS.TO.Group;
+import com.DSS.TO.Issue;
+import com.DSS.TO.Notes;
+import com.DSS.utils.EmailUtil;
+import com.DSS.utils.ReleaseNotePDFUtil;
 import com.itextpdf.text.DocumentException;
 
 public class ReleaseNoteProcessor {

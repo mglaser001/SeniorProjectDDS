@@ -1,4 +1,4 @@
-package com.DDS.TO;
+package com.DSS.TO;
 
 import java.util.HashMap;
 import java.util.List;

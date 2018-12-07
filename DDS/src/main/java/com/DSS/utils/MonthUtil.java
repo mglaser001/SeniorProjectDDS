@@ -1,4 +1,4 @@
-package com.DDS.utils;
+package com.DSS.utils;
 
 import java.util.Calendar;
 

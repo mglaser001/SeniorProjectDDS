@@ -1,4 +1,4 @@
-package com.DDS.DAO;
+package com.DSS.DAO;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,10 +13,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import com.DDS.TO.Group;
-import com.DDS.TO.Issue;
-import com.DDS.TO.Notes;
-import com.DDS.TO.Project;
+import com.DSS.TO.Group;
+import com.DSS.TO.Issue;
+import com.DSS.TO.Notes;
+import com.DSS.TO.Project;
 
 @SpringBootApplication
 public final class GitlabDAO {

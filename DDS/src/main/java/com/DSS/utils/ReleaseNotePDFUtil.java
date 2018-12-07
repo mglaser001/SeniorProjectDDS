@@ -1,4 +1,4 @@
-package com.DDS.utils;
+package com.DSS.utils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -6,7 +6,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.DDS.TO.BaseTO;
+import com.DSS.TO.BaseTO;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
