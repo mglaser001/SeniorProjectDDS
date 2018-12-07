@@ -1,9 +1,16 @@
 package com.DDS.utils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 
 import com.DDS.TO.BaseTO;
 import com.itextpdf.text.BaseColor;
@@ -12,6 +19,8 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.ColumnText;
@@ -25,68 +34,83 @@ public class ReleaseNotePDFUtil {
 
 	List<BaseTO> dataList = new ArrayList<BaseTO>();
 	String reportTitle = "";
-	public static final String RESULT = "_ReleaseNotes.pdf";
+	String description = "";
+	static String RESULT = "_ReleaseNotes.pdf";
+	static String imageUrl = "https://www.mercuryinsurance.com/static/images/logo.png";
+	
+	public ReleaseNotePDFUtil(String title, List<BaseTO> baseto, String description) throws DocumentException, IOException {
+		this.description = description;
 
-	public ReleaseNotePDFUtil(String title, List<BaseTO> baseto) throws DocumentException, IOException {
 		dataList = baseto;
 		reportTitle = title;
 		System.out.println(MonthUtil.MonthYear());
-		createPdf(title.replace(" ", "_") + RESULT);
 	}
 
 	class MyFooter extends PdfPageEventHelper {
-		Font ffont = new Font(Font.FontFamily.UNDEFINED, 5, Font.ITALIC);
+		Font ffont = new Font(Font.FontFamily.UNDEFINED, 12);
 
 		public void onEndPage(PdfWriter writer, Document document) {
 			PdfContentByte cb = writer.getDirectContent();
-			Phrase footer = new Phrase("this is a footer", ffont);
+			Phrase footer = new Phrase("Mercury Insurance - Confidential", ffont);
 
 			ColumnText.showTextAligned(cb, Element.ALIGN_CENTER, footer,
-					(document.right() - document.left()) / 2 + document.leftMargin(), document.bottom() - 10, 0);
+					(document.right() - document.left()) / 2 + document.leftMargin(), document.bottom() , 0);
 		}
 	}
 
-	public void createPdf(String filename) throws DocumentException, IOException {
+	public void createPdf(OutputStream outputStream) throws DocumentException, IOException {
 
-		Document document = new Document();
-		PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(filename));
+	//	File file = new File(reportTitle.replace(" ", "_") + RESULT);
+//		FileOutputStream os = new FileOutputStream(file);
+		Document document = new Document(PageSize.A4_LANDSCAPE.rotate(), 5, 5, 5, 5);
+		PdfWriter writer = PdfWriter.getInstance(document, outputStream);
 		MyFooter event = new MyFooter();
-		writer.setPageEvent(event);
 
+		writer.setPageEvent(event);
+ 
 		document.open();
 		document.setMargins(0.5f, .5f, .5f, .5f);
 		document.add(createHeaderTable());
 		document.add(createTableBody());
 		document.close();
+		
 	}
 
 	private PdfPTable createHeaderTable() {
 		PdfPTable table = new PdfPTable(1);
-		Font headerFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 20);
-		Font dateFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 12);
-		headerFont.setColor(new BaseColor(255, 255, 255));
-		dateFont.setColor(new BaseColor(255, 255, 255));
+		Font headerFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 25);
+		Font dateFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 14);
+		try {
+			Image logo = Image.getInstance(new URL(imageUrl));
 
-		table.addCell(createHeaderCell(81, 10, 10, "Release Date: XX/XX/XXXX", dateFont, Element.ALIGN_RIGHT, "top"));
-		table.addCell(createHeaderCell(81, 10, 10, reportTitle, headerFont, Element.ALIGN_CENTER, "right left"));
-		table.addCell(createHeaderCell(81, 10, 10, MonthUtil.MonthYear(), dateFont, Element.ALIGN_CENTER, "bottom"));
-		table.addCell(createHeaderCell(240, 240, 240, "User Inputed Description",
-				FontFactory.getFont(FontFactory.TIMES_ROMAN, 12), Element.ALIGN_LEFT, "bottom"));
+			headerFont.setColor(new BaseColor(255, 255, 255));
+			dateFont.setColor(new BaseColor(255, 255, 255));
+			table.addCell(createHeaderImageCell(81, 10, 10, logo, Element.ALIGN_LEFT, "top"));
+			table.addCell(createHeaderCell(81, 10, 10, "Release Date: 12/31/2018", dateFont, Element.ALIGN_RIGHT, "right left"));
+			table.addCell(createHeaderCell(81, 10, 10, reportTitle, headerFont, Element.ALIGN_CENTER, "right left"));
+			table.addCell(createHeaderCell(81, 10, 10, MonthUtil.MonthYear(), dateFont, Element.ALIGN_CENTER, "bottom"));
+			table.addCell(createHeaderCell(240, 240, 240, description,
+					FontFactory.getFont(FontFactory.TIMES_ROMAN, 14), Element.ALIGN_LEFT, "bottom"));
+		}catch(Exception e) {
+			System.out.println("Exception Thrown on Image Creation");
+		}
 		return table;
-	}
-
+	} 
 	private PdfPTable createTableBody() {
-		PdfPTable table = new PdfPTable(3);
-		Font headerFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 8, Font.BOLD);
-		Font bodyFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 8);
+		float[] columnWidths = {5, 2, 5};
+		PdfPTable table = new PdfPTable(columnWidths);
+		Font headerFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.BOLD);
+		Font bodyFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 12);
 		table.addCell(createTableCellHead(180, 180, 180, "Change Request/Defect", headerFont, Element.ALIGN_CENTER));
 		table.addCell(createTableCellHead(180, 180, 180, "Requestor", headerFont, Element.ALIGN_CENTER));
 		table.addCell(createTableCellHead(180, 180, 180, "Description", headerFont, Element.ALIGN_CENTER));
 
 		for (BaseTO to : dataList) {
 			table.addCell(createTableCellHead(240, 240, 240, to.getTitle(), bodyFont, Element.ALIGN_CENTER));
-			table.addCell(createTableCellHead(240, 240, 240, to.getBaseMapVal("requestor"), bodyFont, Element.ALIGN_CENTER));
-			table.addCell(createTableCellHead(240, 240, 240, to.getBaseMapVal("description"), bodyFont, Element.ALIGN_LEFT));
+			table.addCell(
+					createTableCellHead(240, 240, 240, to.getBaseMapVal("requestor"), bodyFont, Element.ALIGN_CENTER));
+			table.addCell(
+					createTableCellHead(240, 240, 240, to.getBaseMapVal("description"), bodyFont, Element.ALIGN_LEFT));
 		}
 		return table;
 	}
@@ -94,6 +118,7 @@ public class ReleaseNotePDFUtil {
 	private PdfPCell createTableCellHead(int red, int green, int blue, String text, Font font, int align) {
 
 		PdfPCell cell = new PdfPCell(new Phrase(text, font));
+
 		cell.setBackgroundColor(new BaseColor(red, green, blue));
 		cell.setBorderColor(new BaseColor(red, green, blue));
 		cell.setHorizontalAlignment(align);
@@ -110,6 +135,29 @@ public class ReleaseNotePDFUtil {
 	private PdfPCell createHeaderCell(int red, int green, int blue, String text, Font font, int alignment,
 			String border) {
 		PdfPCell cell = new PdfPCell(new Phrase(text, font));
+		cell.setBackgroundColor(new BaseColor(red, green, blue));
+		cell.setBorderColor(new BaseColor(red, green, blue));
+		cell.setHorizontalAlignment(alignment);
+		cell.setUseVariableBorders(true);
+		if (border.contains("top")) {
+			cell.setBorderColorTop(BaseColor.BLACK);
+			cell.setBorderColorRight(BaseColor.BLACK);
+			cell.setBorderColorLeft(BaseColor.BLACK);
+		} else if (border.contains("right")) {
+			cell.setBorderColorRight(BaseColor.BLACK);
+		} else if (border.contains("left")) {
+			cell.setBorderColorLeft(BaseColor.BLACK);
+		} else if (border.contains("bottom")) {
+			cell.setBorder(Rectangle.LEFT | Rectangle.RIGHT | Rectangle.BOTTOM);
+			cell.setBorderColorRight(BaseColor.BLACK);
+			cell.setBorderColorLeft(BaseColor.BLACK);
+			cell.setBorderColorBottom(BaseColor.BLACK);
+		}
+		return cell;
+	}
+	private PdfPCell createHeaderImageCell(int red, int green, int blue, Image image, int alignment,
+			String border) {
+		PdfPCell cell = new PdfPCell(image);
 		cell.setBackgroundColor(new BaseColor(red, green, blue));
 		cell.setBorderColor(new BaseColor(red, green, blue));
 		cell.setHorizontalAlignment(alignment);

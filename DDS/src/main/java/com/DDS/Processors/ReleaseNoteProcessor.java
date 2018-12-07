@@ -1,28 +1,40 @@
 package com.DDS.Processors;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
 
 import com.DDS.DAO.GitlabDAO;
 import com.DDS.TO.BaseTO;
 import com.DDS.TO.Group;
 import com.DDS.TO.Issue;
 import com.DDS.TO.Notes;
+import com.DDS.utils.EmailUtil;
 import com.DDS.utils.ReleaseNotePDFUtil;
 import com.itextpdf.text.DocumentException;
 
-public class ReleaseNoteProcessor extends BaseProcessor {
+public class ReleaseNoteProcessor {
 
 	List<Issue> issues = new ArrayList<Issue>();
 	List<BaseTO> dataList = new ArrayList<BaseTO>();
-	private String reportTitle;
-
+	private String reportTitle = System.getProperty("ReportTitle");
+	private String emailList = System.getProperty("email");;
+	private String description = System.getProperty("description");;
+	private String[] toEmails;
 	public void initialize() {
 		
-		List<String> issueIid = new ArrayList<String>();
-		String projectid = System.getProperty("ProjectId");
-		reportTitle = System.getProperty("ReportTitle");
+		toEmails = emailList.split(",");
+		
+	//	List<String> issueIid = new ArrayList<String>();
+ 		String projectid = System.getProperty("ProjectId");
 		issues = GitlabDAO.getIssuesFromProjectid(projectid);
 		for (Issue i : issues) {
 			BaseTO sheetData = new BaseTO();
@@ -34,21 +46,23 @@ public class ReleaseNoteProcessor extends BaseProcessor {
 					sheetData.addBaseMap("requestor", n.getBody().replaceAll("#requestor", ""));
 				} else if (n.getBody().contains("#releasenotes")) {
 					counter++;
-					sheetData.addBaseMap("description", "Description: "+ i.getDescription() +"\n" +n.getBody().replaceAll("#releasenotes", ""));
+					sheetData.addBaseMap("description",
+							"Description: " + i.getDescription() + "\n" + n.getBody().replaceAll("#releasenotes", ""));
 				}
 
 			}
 			if (counter > 1) {
+				sheetData.addBaseMap("url", i.getWebUrl());
 				sheetData.setTitle(i.getTitle());
 				dataList.add(sheetData);
 			}
 		}
 	}
 
-	public void process() throws DocumentException, IOException {
-		/*for (BaseTO to : dataList) {
-			System.out.println(to.getTitle());
-		}*/
-		ReleaseNotePDFUtil pdfUtil = new ReleaseNotePDFUtil(reportTitle, dataList);
+	public void process() throws DocumentException, IOException, MessagingException {
+		
+//		ReleaseNotePDFUtil pdfUtil = new ReleaseNotePDFUtil(reportTitle, dataList, description, toEmails);
+
+		EmailUtil.sendmail(reportTitle, dataList, description, toEmails);
 	}
 }
