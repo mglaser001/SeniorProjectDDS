@@ -86,6 +86,7 @@ public class EmailUtil {
 		emailMessage.setContent(mimeMultipart);
 
 		for (int i = 0; i < emails.length; i++) {
+			System.out.println("Adding recipient : " + emails[i].split("@")[0].substring(0, 4) + "####@#####." + emails[i].substring(emails[i].length()-3) );
 			emailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(emails[i]));
 		}
 
