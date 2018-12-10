@@ -46,13 +46,13 @@ public final class GitlabDAO {
 		}
 		return issues;	
 	}
-	public static List<Notes> getNotes(String projectid, String issueiid) {
+	public static List<Notes> getNotes(String projectid, String issueiid, String privatetoken) {
 		List<Notes> notes = new ArrayList<Notes>();
 		RestTemplate restTemplate = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 		
-		String url = resourceURL + "projects/"+ projectid + "/issues/" + issueiid +"/notes?private_token=UTpBGKPUeZe2tSTsaqbh";
+		String url = resourceURL + "projects/"+ projectid + "/issues/" + issueiid +"/notes?private_token="+privatetoken;
 		HttpEntity<String> entity = new HttpEntity<String>(headers);
 		ResponseEntity<Notes[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, Notes[].class);
 		for(Notes i: response.getBody()) {

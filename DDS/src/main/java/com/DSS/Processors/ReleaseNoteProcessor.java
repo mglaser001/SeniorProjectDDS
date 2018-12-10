@@ -27,7 +27,9 @@ public class ReleaseNoteProcessor {
 	List<BaseTO> dataList = new ArrayList<BaseTO>();
 	private String reportTitle = System.getProperty("ReportTitle");
 	private String emailList = System.getProperty("email");;
-	private String description = System.getProperty("description");;
+	private String description = System.getProperty("description");
+	private String privatetoken = System.getProperty("privatetoken");
+	private String password = System.getProperty("password");
 	private String[] toEmails;
 	
 	public void initialize() {
@@ -38,7 +40,7 @@ public class ReleaseNoteProcessor {
 		issues = GitlabDAO.getIssuesFromProjectid(projectid);
 		for (Issue i : issues) {
 			BaseTO sheetData = new BaseTO();
-			List<Notes> notes = GitlabDAO.getNotes(projectid, i.getIid().toString());
+			List<Notes> notes = GitlabDAO.getNotes(projectid, i.getIid().toString(), privatetoken);
 			int counter = 0;
 			for (Notes n : notes) {
 				if (n.getBody().contains("#requestor")) {
@@ -60,9 +62,10 @@ public class ReleaseNoteProcessor {
 	}
 
 	public void process() throws DocumentException, IOException, MessagingException {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		
-//		ReleaseNotePDFUtil pdfUtil = new ReleaseNotePDFUtil(reportTitle, dataList, description, toEmails);
-
-		EmailUtil.sendmail(reportTitle, dataList, description, toEmails);
+		ReleaseNotePDFUtil pdfUtil = new ReleaseNotePDFUtil(reportTitle, dataList, description);
+		pdfUtil.createPdf(outputStream);
+		EmailUtil.sendmail(reportTitle, outputStream, toEmails, password);
 	}
 }

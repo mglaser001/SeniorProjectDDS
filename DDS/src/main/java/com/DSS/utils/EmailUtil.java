@@ -32,14 +32,14 @@ public class EmailUtil {
 	Session mailSession;
 	MimeMessage emailMessage;
 
-	public static void sendmail(String reportTitle, List<BaseTO> to, String descrip, String[] emails)
+	public static void sendmail(String reportTitle, ByteArrayOutputStream outputStream, String[] emails, String password)
 			throws AddressException, MessagingException, DocumentException, IOException {
 
 		EmailUtil javaEmail = new EmailUtil();
 
 		javaEmail.setMailServerProperties();
-		javaEmail.createEmailMessage(reportTitle, to, descrip, emails);
-		javaEmail.sendEmail();
+		javaEmail.createEmailMessage(reportTitle, outputStream, emails);
+		javaEmail.sendEmail(password);
 	}
 
 	public void setMailServerProperties() {
@@ -53,18 +53,12 @@ public class EmailUtil {
 
 	}
 
-	public void createEmailMessage(String reportTitle, List<BaseTO> to, String descrip, String[] emails)
+	public void createEmailMessage(String reportTitle, ByteArrayOutputStream outputStream, String[] emails)
 			throws AddressException, MessagingException, DocumentException, IOException {
 
-		ReleaseNotePDFUtil pdf = new ReleaseNotePDFUtil(reportTitle, to, descrip);
-		ByteArrayOutputStream outputStream = null;
 		MimeBodyPart textBodyPart = new MimeBodyPart();
 		textBodyPart.setText("Attached are the Release Notes for " + reportTitle);
 
-		// now write the PDF content to the output stream
-		outputStream = new ByteArrayOutputStream();
-
-		pdf.createPdf(outputStream);
 		byte[] bytes = outputStream.toByteArray();
 
 		// construct the pdf body part
@@ -92,11 +86,11 @@ public class EmailUtil {
 
 	}
 
-	public void sendEmail() throws AddressException, MessagingException {
+	public void sendEmail(String password) throws AddressException, MessagingException {
 		System.out.println("Sending Email...");
 		String emailHost = "smtp.gmail.com";
 		String fromUser = "mglaser001";// just the id alone without @gmail.com
-		String fromUserEmailPassword = "Toadboy2562";
+		String fromUserEmailPassword = password;
 
 		Transport transport = mailSession.getTransport("smtp");
 
@@ -106,22 +100,5 @@ public class EmailUtil {
 		System.out.println("=================Email sent successfully=================");
 	}
 
-	public void writePdf(OutputStream outputStream) throws Exception {
-		Document document = new Document();
-		PdfWriter.getInstance(document, outputStream);
 
-		document.open();
-
-		document.addTitle("Test PDF");
-		document.addSubject("Testing email PDF");
-		document.addKeywords("iText, email");
-		document.addAuthor("Jee Vang");
-		document.addCreator("Jee Vang");
-
-		Paragraph paragraph = new Paragraph();
-		paragraph.add(new Chunk("hello!"));
-		document.add(paragraph);
-
-		document.close();
-	}
 }
