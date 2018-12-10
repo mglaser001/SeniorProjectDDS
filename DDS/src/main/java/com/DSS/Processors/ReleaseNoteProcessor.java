@@ -1,20 +1,14 @@
 package com.DSS.Processors;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMessageHelper;
 
 import com.DSS.DAO.GitlabDAO;
 import com.DSS.TO.BaseTO;
-import com.DSS.TO.Group;
 import com.DSS.TO.Issue;
 import com.DSS.TO.Notes;
 import com.DSS.utils.EmailUtil;
@@ -31,12 +25,12 @@ public class ReleaseNoteProcessor {
 	private String privatetoken = System.getProperty("privatetoken");
 	private String password = System.getProperty("password");
 	private String[] toEmails;
-	
+
 	public void initialize() {
-		
+
 		toEmails = emailList.split(",");
 
- 		String projectid = System.getProperty("ProjectId");
+		String projectid = System.getProperty("ProjectId");
 		issues = GitlabDAO.getIssuesFromProjectid(projectid);
 		for (Issue i : issues) {
 			BaseTO sheetData = new BaseTO();
@@ -63,7 +57,7 @@ public class ReleaseNoteProcessor {
 
 	public void process() throws DocumentException, IOException, MessagingException {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		
+
 		ReleaseNotePDFUtil pdfUtil = new ReleaseNotePDFUtil(reportTitle, dataList, description);
 		pdfUtil.createPdf(outputStream);
 		EmailUtil.sendmail(reportTitle, outputStream, toEmails, password);

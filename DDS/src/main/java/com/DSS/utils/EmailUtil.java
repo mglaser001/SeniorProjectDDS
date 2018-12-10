@@ -2,8 +2,6 @@ package com.DSS.utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.List;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
@@ -19,12 +17,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
-import com.DSS.TO.BaseTO;
-import com.itextpdf.text.Chunk;
-import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.PdfWriter;
 
 public class EmailUtil {
 
@@ -32,8 +25,8 @@ public class EmailUtil {
 	Session mailSession;
 	MimeMessage emailMessage;
 
-	public static void sendmail(String reportTitle, ByteArrayOutputStream outputStream, String[] emails, String password)
-			throws AddressException, MessagingException, DocumentException, IOException {
+	public static void sendmail(String reportTitle, ByteArrayOutputStream outputStream, String[] emails,
+			String password) throws AddressException, MessagingException, DocumentException, IOException {
 
 		EmailUtil javaEmail = new EmailUtil();
 
@@ -80,7 +73,8 @@ public class EmailUtil {
 		emailMessage.setContent(mimeMultipart);
 
 		for (int i = 0; i < emails.length; i++) {
-			System.out.println("Adding recipient : " + emails[i].split("@")[0].substring(0, 4) + "####@#####." + emails[i].substring(emails[i].length()-3) );
+			System.out.println("Adding recipient : " + emails[i].split("@")[0].substring(0, 4) + "####@#####."
+					+ emails[i].substring(emails[i].length() - 3));
 			emailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(emails[i]));
 		}
 
@@ -99,6 +93,5 @@ public class EmailUtil {
 		transport.close();
 		System.out.println("=================Email sent successfully=================");
 	}
-
 
 }
